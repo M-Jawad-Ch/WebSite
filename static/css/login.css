@@ -1,0 +1,59 @@
+:root 
+{
+    --bg-color: #F8F4EA;
+    --leaf-color: #ECE8DD;
+    --txt-color: black;
+    --header-color: #246fb6;
+}
+
+body
+{
+    background-color: var(--bg-color);
+    color: var(--txt-color);
+
+    height: 100vh;
+}
+
+.leaf
+{
+    margin: auto; padding: 10vh;
+    width: fit-content;
+    transform: translateY(20%);
+
+    border-radius: 20px;
+
+    background-color: var(--leaf-color);
+}
+
+.header
+{
+    text-align: center;
+}
+
+#head
+{
+    font-weight: bolder;
+    color: var(--header-color);
+}
+
+.form-container
+{
+    text-align: center;
+    margin-top: 50%;
+    margin-bottom: 5%;
+}
+
+input
+{
+    outline: none;
+    border: solid;
+    border-width: 1px;
+    padding: 2px 5px;
+}
+
+#incorrect
+{
+    text-align: center;
+    color:red;
+    font-weight: bolder;
+}
