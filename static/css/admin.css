@@ -1,0 +1,72 @@
+*
+{
+    margin: 0;
+}
+body
+{
+    height: 100vh;
+}
+.row
+{
+    margin: 0;
+    padding: 0;
+}
+:root
+{
+    --header-col: whitesmoke;
+    --sidebar-bg-col: #4D455D;
+}
+a
+{
+    color:inherit;
+}
+a:hover
+{
+    color: inherit;
+}
+
+h1 {margin: 0;} h2 {margin: 0;}
+.main
+{
+    height: 100%;
+    margin: 0;
+}
+.sidebar
+{
+    background-color: var(--sidebar-bg-col);
+    color: var(--header-col);
+    height: 100%;
+    padding: 2em 0em;
+    padding-left: 1em;
+}
+.options
+{
+    font-size: 1.2vw;
+    margin: 0.5em 0em 0.5em;
+}
+#logo
+{
+    margin: 0;
+    font-weight: bolder;
+    font-size: 1.8vw;
+}
+
+.header
+{
+    background-color: var(--header-col);
+    padding: 0.2em 1em;
+    height: 2em;
+}
+
+.main-body
+{
+    padding: 0;
+    height: 100%;
+}
+
+.container-type
+{
+    margin: 0;
+    padding: 0.3em;
+    height: 100%
+}

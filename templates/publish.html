@@ -1,0 +1,85 @@
+{% extends "admin.html" %}
+
+{% block head %}
+<style>
+    
+    #content
+    {
+        height: 95%;
+    }
+    .title
+    {
+        text-align: center;
+        padding: 1em;
+    }
+    #title-text
+    {
+        font-weight: bold;
+        font-style: italic;
+    }
+    .text-fields
+    {
+        width: 100%; height: 80%;
+        padding: 1em 2.5em 0.2em;
+    }
+    #title-input
+    {
+        width: 100%;
+        outline: none;
+        padding: 0.1em 0.3em;
+    }
+    .sub-fields
+    {
+        height: 90%;
+    }
+    #main-input
+    {
+        width: 100%; height: 100%;
+        outline: none;
+        padding: 0.1em 0.3em;
+        margin-top: 1em;
+        resize: none;
+    }
+    #preview
+    {
+        margin-top: 1em;
+        width: 100%; height: 100%;
+        border: solid 1px black;
+        padding: 0.1em 0.3em;
+        height: inherit;
+        overflow:auto;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div id="content">
+    <div class="title">
+        <h1 id="title-text">Create a New Post</h1>
+    </div>
+    <div class="text-fields">
+        <div class="row container-type" style="height: fit-content;">
+            <input type="text" id="title-input" placeholder="Enter the title of the post">
+        </div>
+        <div class="row sub-fields">
+            <div class="col-sm-4 container-type">
+                <textarea id="main-input" placeholder="Type the body of the post."></textarea>
+            </div>
+            <div class="col-sm-8 container-type">
+                <div id="preview">
+                    Preview
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+{% block footer %}
+
+<script src="{{url_for('static',filename='js/publish.js')}}"></script>
+
+{% endblock %}
