@@ -1,6 +1,5 @@
 from sqlalchemy import create_engine, Column, String
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, declarative_base
 
 Base = declarative_base()
 engine = None
@@ -8,7 +7,7 @@ engine = None
 class Post(Base):
     __tablename__ = 'posts'
 
-    title = Column("title", String, key=True, unique=True)
+    title = Column("title", String, primary_key=True)
     body = Column("body", String)
 
     def __init__(self, title, body) -> None:

@@ -49,6 +49,15 @@
         height: inherit;
         overflow:auto;
     }
+    .buttons
+    {
+        padding: 0em 3em;
+    }
+    #post-btn
+    {
+        outline: transparent;
+        padding: 0.1em 1em;
+    }
 </style>
 {% endblock %}
 
@@ -63,15 +72,18 @@
             <input type="text" id="title-input" placeholder="Enter the title of the post">
         </div>
         <div class="row sub-fields">
-            <div class="col-sm-4 container-type">
+            <div class="col-xs-4 container-type">
                 <textarea id="main-input" placeholder="Type the body of the post."></textarea>
             </div>
-            <div class="col-sm-8 container-type">
+            <div class="col-xs-8 container-type">
                 <div id="preview">
                     Preview
                 </div>
             </div>
         </div>
+    </div>
+    <div class="row buttons">
+        <button id="post-btn">Post</button>
     </div>
 </div>
 

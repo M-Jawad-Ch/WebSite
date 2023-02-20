@@ -23,7 +23,9 @@ submit_btn.addEventListener('click', async (event) => {
             }),
             headers:{
                 'Content-type':'application/json',
-            }})
+            }
+        }
+    )
     
     if (res.redirected) {
         window.location.href = res.url
