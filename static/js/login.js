@@ -14,7 +14,7 @@ submit_btn.addEventListener('click', async (event) => {
     event.preventDefault()
 
     let res = await fetch(
-        'http://localhost:5000/verify', 
+        '/verify', 
         {
             method:'POST',
             body:JSON.stringify({

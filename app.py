@@ -29,7 +29,7 @@ def verify():
     if params['username'] == 'jawad' and md5(params['password'].encode()).hexdigest() == os.environ['admin_pass']:
         session['user'] = 'jawad'
         return redirect('/admin')
-    else: return make_response(400)
+    else: return make_response('', 404)
 
 @app.route('/logout', methods=['POST'])
 def logout():
@@ -47,14 +47,14 @@ def admin_opts(val):
     if 'user' not in session:
         return redirect('login')
 
-    opts = ['publish']
+    opts = ['publish', 'view-all']
 
     if val not in opts:
         return render_template('404.html')
     
     return render_template(val + '.html')
 
-@app.route('/admin-post/<val>', methods=['POST','GET'])
+@app.route('/admin-post/<val>', methods=['GET', 'POST', 'OPTIONS'])
 def admin_posts(val):
     if 'user' not in session:
         return redirect('login')
@@ -76,7 +76,7 @@ def admin_posts(val):
         
         return make_response(jsonify({'status':'success'}), 200)
     
-    """elif val == 'get':
+    elif val == 'get':
         p = dbHandler.get(params['title'])
         return make_response(jsonify({'title':p.title, 'body':p.body}))
     
@@ -84,7 +84,7 @@ def admin_posts(val):
         posts = dbHandler.get_all()
         return make_response(jsonify( [{'title':p.title, 'body':p.body} for p in posts] ))
     
-    elif val == 'update':
+    """elif val == 'update':
         dbHandler.update(params['prev-title'], params['title'], params['body'])
         return make_response(200)
     
@@ -96,7 +96,7 @@ def admin_posts(val):
         dbHandler.delete(params['title'])
         return make_response(200)"""
     
-    return make_response('Not found' ,400)
+    return make_response('Not found' , 404)
 
 
 if __name__ == '__main__':

@@ -58,6 +58,12 @@
         outline: transparent;
         padding: 0.1em 1em;
     }
+    .container-type
+    {
+        margin: 0;
+        padding: 0.3em;
+        height: 100%
+    }
 </style>
 {% endblock %}
 
@@ -91,7 +97,38 @@
 
 
 {% block footer %}
+<script>
+    const title = document.getElementById('title-input')
+    const input = document.getElementById('main-input')
+    const preview = document.getElementById('preview')
 
-<script src="{{url_for('static',filename='js/publish.js')}}"></script>
+    input.addEventListener('input', (event) => {
+        preview.innerHTML = input.value;
+        title.style.color = 'black';
+    })
 
+    const postBtn = document.getElementById('post-btn')
+    postBtn.addEventListener('click', async (event) => {
+        let res = await fetch(
+            '/admin-post/publish',
+            {
+                method:'POST',
+                body: JSON.stringify({
+                    'title':title.value,
+                    'body':input.value
+                }),
+                headers: {
+                    'Content-type':'application/json'
+                }
+            }
+        )
+        
+        res = await res.json()
+
+        if (res['status'] === 'failure') {
+            title.style.color = 'red';
+            preview.innerHTML = 'An existing post already has the title.'
+        } else alert('The post has been published successfully.')
+    })
+</script>
 {% endblock %}

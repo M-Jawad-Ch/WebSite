@@ -1,0 +1,100 @@
+{% extends "admin.html" %}
+
+{% block head %}
+<style>
+#content {
+    padding: 2em;
+}
+
+.col-md-5, .col-md-7, .col-sm-5, col-sm-7 {
+    padding: 0;
+}
+
+.container-type {
+    padding: 0.5em 0.5em;
+}
+
+#title-view {
+    overflow: auto;
+    padding: 0.1em 0.3em;
+    border: solid 2px rgba(0, 0, 0, 0.5);
+    border-radius: 0.3em;
+    height: 30em;
+}
+
+#body-view {
+    overflow: auto;
+    padding: 0.1em 0.3em;
+    border: solid 2px rgba(0, 0, 0, 0.5);
+    border-radius: 0.3em;
+    height: 30em;
+}
+
+.titles
+{
+    user-select: initial;
+    -webkit-user-select: initial;
+    background-color: antiquewhite;
+    margin: 0.1em 0em;
+    padding: 0.1em 0.3em;
+}
+</style>
+{% endblock %}
+
+
+
+{% block content %}
+<div id="content">
+    <div class="row">
+        <div class="col-md-5 col-sm-7">
+            <div class="container-type">
+                <div id="title-view">
+                    
+                    <!--<div class="row titles" onclick="display_body(0)"> Item </div>-->
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-7 col-sm-5">
+            <div class="container-type">
+                <div id="body-view">
+                    Body
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+{% block footer %}
+<script>
+    let res = [], current = 0;
+    const bodyView = document.getElementById('body-view');
+    const titleView = document.getElementById('title-view');
+
+    function showBody(idx) {
+        bodyView.innerHTML = res[idx].body
+        current = idx;
+    }
+    fetch(
+        '/admin-post/get-all',
+        {
+            method:'POST',
+            headers: {
+                'content-type':'application/json'
+            },
+            body: JSON.stringify({})
+        }
+    ).then( response => response.json()).then( x => {
+        res = x;
+        let titles = document.getElementById('title-view')
+        for(let i = 0; i < res.length; i++) {
+            titles.innerHTML += `
+            <div class="row titles" onclick="showBody(${i})"> ${res[i].title} </div>
+            `
+        }
+    })
+</script>
+{% endblock %}
