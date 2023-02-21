@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 from hashlib import md5
 
-from Modules.databasehandler import DbHandler, Post
+from Modules.databasehandler import DbHandler, Post, title_parser
 
 from sqlalchemy.exc import IntegrityError
 
@@ -77,19 +77,19 @@ def admin_posts(val):
         return make_response(jsonify({'status':'success'}), 200)
     
     elif val == 'get':
-        p = dbHandler.get(params['title'])
-        return make_response(jsonify({'title':p.title, 'body':p.body}))
+        p = dbHandler.get(title_parser(params['title']))
+        return make_response(jsonify({'url':p.url, 'title':p.title, 'body':p.body}))
     
     elif val == 'get-all':
         posts = dbHandler.get_all()
-        return make_response(jsonify( [{'title':p.title, 'body':p.body} for p in posts] ))
+        return make_response(jsonify( [{'url':p.url, 'title':p.title, 'body':p.body} for p in posts] ))
     
     elif val == 'delete':
-        dbHandler.delete(params['title'])
+        dbHandler.delete(title_parser(params['title']))
         return make_response("", 200)
 
     elif val == 'update':
-        dbHandler.update(params['prev-title'], Post(params['title'], params['body']))
+        dbHandler.update(title_parser(params['prev-title']), Post(params['title'], params['body']))
         return make_response("", 200)
     
     return make_response('Not found' , 404)

@@ -1,16 +1,23 @@
 from sqlalchemy import create_engine, Column, String
 from sqlalchemy.orm import sessionmaker, declarative_base
+from re import sub
 
 Base = declarative_base()
 engine = None
 
+def title_parser(title:str) -> str:
+    s = sub(r'[^a-z\s]','',title.lower())
+    return sub(r'\s','-',s)
+
 class Post(Base):
     __tablename__ = 'posts'
 
-    title = Column("title", String, primary_key=True)
+    url = Column('url', String, primary_key=True)
+    title = Column("title", String)
     body = Column("body", String)
 
     def __init__(self, title, body) -> None:
+        self.url = title_parser(title)
         self.title = title
         self.body = body
     
@@ -43,13 +50,7 @@ class DbHandler():
         self.sess.commit()
     
     def get(self, key:str) -> Post:
-        q = self.sess.query(Post).filter(Post.title == key)
-        return [ x for x in q ][0]
-    
-    def update_title(self, key:str, new_title:str) -> None:
-        post = self.get(key)
-        post.title = new_title
-        self.update(key, post)
+        return self.sess.get(Post, key)
     
     def get_all(self) -> list:
         return self.sess.query(Post).all()

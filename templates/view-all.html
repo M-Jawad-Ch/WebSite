@@ -38,8 +38,6 @@
 
 .titles
 {
-    user-select: initial;
-    -webkit-user-select: initial;
     background-color: var(--title-bg-col);
     margin: 0.1em 0em;
     padding: 0.1em 0.3em;
@@ -59,6 +57,14 @@
     color: var(--selected-text-col);
 }
 
+#url-view {
+    overflow: auto;
+    padding: 0.1em 0.3em;
+    border: solid 2px rgba(0, 0, 0, 0.5);
+    border-radius: 0.3em;
+    width: 100%;
+}
+
 </style>
 {% endblock %}
 
@@ -74,22 +80,32 @@
                     <button id="edit-btn">Edit</button>
                     <button id="cancel-btn">Cancel</button>
                     <button id="save-btn">Save Changes</button>
-                    <button id="delete-btn">Delete</button>                </div>
-            </div>
-        </div>
-        <div class="col-md-5 col-sm-7">
-            <div class="container-type">
-                <div id="title-view">
-                    
-                    <!--<div class="row titles" onclick="display_body(0)"> Item </div>-->
-
+                    <button id="delete-btn">Delete</button>
                 </div>
             </div>
         </div>
-        <div class="col-md-7 col-sm-5">
+        <div class="row">
+            <div class="col-md-5 col-sm-7">
+                <div class="container-type">
+                    <div id="title-view">
+                        
+                        <!--<div class="row titles" onclick="display_body(0)"> Item </div>-->
+    
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7 col-sm-5">
+                <div class="container-type">
+                    <div id="body-view">
+                        Body
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
             <div class="container-type">
-                <div id="body-view">
-                    Body
+                <div id="url-view">
+                    <br>
                 </div>
             </div>
         </div>
@@ -104,6 +120,7 @@
     let items = [], current = -1, prevTitle = null;
     const bodyView = document.getElementById('body-view');
     const titleViews = document.getElementById('title-view');
+    const urlView = document.getElementById('url-view')
 
     function selectItem(idx, length) {
         if (document.getElementById('title-edit-input')) {
@@ -120,6 +137,8 @@
 
         const t = document.getElementById(`title-${idx}`)
         t.style.backgroundColor = 'var(--title-selected-col)';
+
+        urlView.innerHTML = items[idx].url
     }
 
     function displayTitles(parent, list) {
@@ -129,6 +148,8 @@
             <div class="row titles" onclick="selectItem(${i}, ${list.length})" id="title-${i}"> ${list[i].title} </div>
             `
         }
+
+        urlView.innerHTML = '<br>'
     }
 
     const refreshBtn = document.getElementById('refresh-btn')
