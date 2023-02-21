@@ -54,7 +54,7 @@ def admin_opts(val):
     
     return render_template(val + '.html')
 
-@app.route('/admin-post/<val>', methods=['GET', 'POST', 'OPTIONS'])
+@app.route('/admin-post/<val>', methods=['GET', 'POST', 'OPTIONS', 'DELETE'])
 def admin_posts(val):
     if 'user' not in session:
         return redirect('login')
@@ -84,17 +84,13 @@ def admin_posts(val):
         posts = dbHandler.get_all()
         return make_response(jsonify( [{'title':p.title, 'body':p.body} for p in posts] ))
     
-    """elif val == 'update':
-        dbHandler.update(params['prev-title'], params['title'], params['body'])
-        return make_response(200)
-    
-    elif val == 'update-title':
-        dbHandler.update_title(params['prev-title'], params['title'])
-        return make_response(200)
-    
     elif val == 'delete':
         dbHandler.delete(params['title'])
-        return make_response(200)"""
+        return make_response("", 200)
+
+    elif val == 'update':
+        dbHandler.update(params['prev-title'], Post(params['title'], params['body']))
+        return make_response("", 200)
     
     return make_response('Not found' , 404)
 
