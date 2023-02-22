@@ -42,6 +42,15 @@ def admin():
         return redirect('login')
     return render_template('admin.html')
 
+@app.route('/posts/<url>')
+def posts(url):
+    data = dbHandler.get(url)
+
+    if not data:
+        render_template('404.html')
+    
+    return render_template('posts.html', data={'heading':data.title, 'body':data.body})
+
 """@app.route('/admin/<val>')
 def admin_opts(val):
     if 'user' not in session:
