@@ -42,7 +42,7 @@ def admin():
         return redirect('login')
     return render_template('admin.html')
 
-@app.route('/admin/<val>')
+"""@app.route('/admin/<val>')
 def admin_opts(val):
     if 'user' not in session:
         return redirect('login')
@@ -52,7 +52,7 @@ def admin_opts(val):
     if val not in opts:
         return render_template('404.html')
     
-    return render_template(val + '.html')
+    return render_template(val + '.html')"""
 
 @app.route('/admin-post/<val>', methods=['GET', 'POST', 'OPTIONS', 'DELETE'])
 def admin_posts(val):

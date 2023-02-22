@@ -6,23 +6,423 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{url_for('static', filename='css/bootstrap/css/bootstrap.min.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/admin.css')}}">
-    {% block head %} {% endblock %}
+    <style id="head-block"></style>
     <title>Dashboard</title>
 </head>
 <body>
+
     <div class="row main">
         <div class="col-xs-2 sidebar">
             <a href="/admin"><h1 class="options" id="logo">Dashboard</h1></a>
-            <a href="/admin/publish"><h2 class="options">> Publish</h2></a>
-            <a href="/admin/view-all"><h2 class="options">> View All</h2></a>
+
+            <h2 class="options" onclick="showPublish()">Publish</h2>
+
+            <h2 class="options" onclick="showViewAll()">View All</h2>
+
         </div>
         <div class="col-sm-10 col-xs-12 main-body">
             <div class="header">
-                header
+                <br>
             </div>
-            {% block content %} {% endblock %}
+
+            <div id="content"></div>
+
         </div>
     </div>
-    {% block footer %} {% endblock %}
+
+    <script>
+        const headBlock = document.getElementById('head-block')
+        const contentBlock = document.getElementById('content')
+        const footerBlock = document.getElementById('footer-block')
+
+        let title = null, input = null, preview = null;
+
+        let items = [], current = -1, prevTitle = null, firstTime = true;
+
+        let bodyView = null, titleViews = null, urlView = null;
+
+        function showPublish() {
+            headBlock.innerHTML = `
+                #content
+                {
+                    height: 95%;
+                }
+                .title
+                {
+                    text-align: center;
+                    padding: 1em;
+                }
+                #title-text
+                {
+                    font-weight: bold;
+                    font-style: italic;
+                }
+                .text-fields
+                {
+                    width: 100%; height: 80%;
+                    padding: 1em 2.5em 0.2em;
+                }
+                #title-input
+                {
+                    width: 100%;
+                    outline: none;
+                    padding: 0.1em 0.3em;
+                }
+                .sub-fields
+                {
+                    height: 90%;
+                }
+                #main-input
+                {
+                    width: 100%; height: 100%;
+                    outline: none;
+                    padding: 0.1em 0.3em;
+                    margin-top: 1em;
+                    resize: none;
+                }
+                #preview
+                {
+                    margin-top: 1em;
+                    width: 100%; height: 100%;
+                    border: solid 1px black;
+                    padding: 0.1em 0.3em;
+                    height: inherit;
+                    overflow:auto;
+                }
+                .buttons
+                {
+                    padding: 0em 3em;
+                }
+                #post-btn
+                {
+                    outline: transparent;
+                    padding: 0.1em 1em;
+                }
+                .container-type
+                {
+                    margin: 0;
+                    padding: 0.3em;
+                    height: 100%
+                }
+            `
+
+            contentBlock.innerHTML = `
+                <div class="title">
+                    <h1 id="title-text">Create a New Post</h1>
+                </div>
+                <div class="text-fields">
+                    <div class="row container-type" style="height: fit-content;">
+                        <input type="text" id="title-input" placeholder="Enter the title of the post">
+                    </div>
+                    <div class="row sub-fields">
+                        <div class="col-xs-4 container-type">
+                            <textarea id="main-input" placeholder="Type the body of the post."></textarea>
+                        </div>
+                        <div class="col-xs-8 container-type">
+                            <div id="preview">
+                                Preview
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row buttons">
+                    <button id="post-btn">Post</button>
+                </div>
+            `
+        
+            title = document.getElementById('title-input')
+            input = document.getElementById('main-input')
+            preview = document.getElementById('preview')
+
+            input.addEventListener('input', (event) => {
+                preview.innerHTML = input.value;
+                title.style.color = 'black';
+            })
+
+            const postBtn = document.getElementById('post-btn')
+            postBtn.addEventListener('click', async (event) => {
+                let res = await fetch(
+                    '/admin-post/publish',
+                    {
+                        method:'POST',
+                        body: JSON.stringify({
+                            'title':title.value,
+                            'body':input.value
+                        }),
+                        headers: {
+                            'Content-type':'application/json'
+                        }
+                    }
+                )
+                
+                res = await res.json()
+
+                if (res['status'] === 'failure') {
+                    title.style.color = 'red';
+                    preview.innerHTML = 'An existing post already has the title.'
+                } else alert('The post has been published successfully.')
+            })
+        
+        }
+    
+        function displayTitles(parent, list) {
+            parent.innerHTML = '';
+            for(let i = 0; i < list.length; i++) {
+                parent.innerHTML += `
+                <div class="row titles" onclick="selectItem(${i}, ${list.length})" id="title-${i}"> ${list[i].title} </div>
+                `
+            }
+
+            urlView.innerHTML = '<br>'
+        }
+
+        function showViewAll() {
+            headBlock.innerHTML = `
+            :root {
+                --title-bg-col:antiquewhite;
+                --title-selected-col:wheat;
+                --selected-text-col:gray;
+            }
+
+            #content {
+                padding: 2em;
+            }
+
+            .col-md-5, .col-md-7, .col-sm-5, col-sm-7 {
+                padding: 0;
+            }
+
+            .container-type {
+                padding: 0.5em 0.5em;
+            }
+
+            #title-view {
+                overflow: auto;
+                padding: 0.1em 0.3em;
+                border: solid 2px rgba(0, 0, 0, 0.5);
+                border-radius: 0.3em;
+                height: 30em;
+            }
+
+            #body-view {
+                overflow: auto;
+                padding: 0.1em 0.3em;
+                border: solid 2px rgba(0, 0, 0, 0.5);
+                border-radius: 0.3em;
+                height: 30em;
+            }
+
+            .titles
+            {
+                background-color: var(--title-bg-col);
+                margin: 0.1em 0em;
+                padding: 0.1em 0.3em;
+            }
+
+            #title-edit-input {
+                outline: transparent;
+                width: 100%;
+            }
+
+            #body-edit-input {
+                outline: transparent;
+                resize: none;
+                width: 100%; height: 90%;
+                overflow: auto;
+                border: none;
+                color: var(--selected-text-col);
+            }
+
+            #url-view {
+                overflow: auto;
+                padding: 0.1em 0.3em;
+                border: solid 2px rgba(0, 0, 0, 0.5);
+                border-radius: 0.3em;
+                width: 100%;
+            }
+            `
+        
+            contentBlock.innerHTML = `
+            <div class="row">
+                <div class="row">
+                    <div class="container-type">
+                        <div id="buttons">
+                            <button id="refresh-btn">Refresh</button>
+                            <button id="edit-btn">Edit</button>
+                            <button id="cancel-btn">Cancel</button>
+                            <button id="save-btn">Save Changes</button>
+                            <button id="delete-btn">Delete</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-5 col-sm-7">
+                        <div class="container-type">
+                            <div id="title-view">
+                                
+                                <!--<div class="row titles" onclick="display_body(0)"> Item </div>-->
+            
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-sm-5">
+                        <div class="container-type" id="body-view-container">
+                            <div id="body-view">
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="container-type">
+                        <div id="url-view">
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `
+        
+            bodyView = document.getElementById('body-view');
+            titleViews = document.getElementById('title-view');
+            urlView = document.getElementById('url-view')
+
+            const refreshBtn = document.getElementById('refresh-btn')
+            refreshBtn.addEventListener('click', async (event) => {
+                let res = await fetch(
+                    '/admin-post/get-all',
+                    {
+                        method:'POST',
+                        headers: {
+                            'content-type':'application/json'
+                        },
+                        body: JSON.stringify({})
+                    }
+                )
+
+                res = await res.json()
+                displayTitles(titleViews, res);
+                bodyView.innerHTML = ''
+                current = -1; items = res;
+            })
+
+            const deleteBtn = document.getElementById('delete-btn');
+            deleteBtn.addEventListener('click', async (event) => {
+                if (current == -1) return;
+                let response = await fetch(
+                    '/admin-post/delete',
+                    {
+                        method:'DELETE',
+                        headers: {
+                            'content-type':'application/json'
+                        },
+                        body: JSON.stringify({'title':items[current].title})
+                    }
+                )
+
+                if (response.status != 200) {
+                    console.log(`Error while delete ${response.status}`)
+                    return
+                }
+
+                items[current] = items[ items.length - 1 ]; items.pop()
+                displayTitles(titleViews, items);
+                bodyView.innerHTML = ''
+            })
+
+            const editBtn = document.getElementById('edit-btn');
+            editBtn.addEventListener('click', async (event) => {
+                if (document.getElementById('title-edit-input') || current == -1) {
+                    return
+                }
+
+                const titleText = items[current].title;
+                const titleView = document.getElementById(`title-${current}`)
+                
+                titleView.innerHTML = '<input type="text" id="title-edit-input">';
+                document.getElementById('title-edit-input').value = titleText;
+
+                prevTitle = titleText;
+                const bodyText = items[current].body;
+                bodyView.innerHTML = '<textarea id="body-edit-input"></textarea>';
+                document.getElementById('body-edit-input').value = bodyText;
+            })
+
+            const saveBtn = document.getElementById('save-btn');
+            saveBtn.addEventListener('click', async (event) => {
+                if (current == -1 ) return
+
+                const titleEditInput = document.getElementById('title-edit-input')
+                const bodyEditInput = document.getElementById('body-edit-input')
+
+                let res = await fetch(
+                    '/admin-post/update',
+                    {
+                        method:'POST',
+                        headers: {
+                            'content-type':'application/json'
+                        },
+                        body:JSON.stringify({
+                            'prev-title':prevTitle,
+                            'title':titleEditInput.value,
+                            'body':bodyEditInput.value
+                        })
+                    }
+                )
+
+                if (res.status != 200) {
+                    console.log(`Error while update ${res.status}`)
+                    return
+                }
+
+                refreshBtn.click();
+
+            })
+
+            const cancelBtn = document.getElementById('cancel-btn');
+            cancelBtn.addEventListener('click', async (event) => {
+                current = -1; prevTitle = null;
+                displayTitles(titleViews, items);
+                bodyView.innerHTML = ''
+            })
+
+            document.addEventListener('click', function(event) {
+                if (!content.contains(event.target)) {
+                    if (prevTitle) cancelBtn.click();
+                }
+            });
+             
+            if (firstTime) {
+                refreshBtn.click()
+                firstTime = false;
+            } else {
+                if (items) {
+                    displayTitles(titleViews, items)
+                }
+            }
+        }
+
+        function selectItem(idx, length) {
+            if (document.getElementById('title-edit-input')) {
+                return
+            }
+
+            bodyView.innerHTML = items[idx].body
+            current = idx;
+            
+            for(let i = 0; i < length; i++) {
+                const t = document.getElementById(`title-${i}`)
+                t.style.backgroundColor = 'var(--title-bg-col)';
+            }
+
+            const t = document.getElementById(`title-${idx}`)
+            t.style.backgroundColor = 'var(--title-selected-col)';
+
+            urlView.innerHTML = items[idx].url
+        }
+
+    </script>
+
+    <script id="footer-block"></script>
 </body>
 </html>

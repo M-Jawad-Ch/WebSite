@@ -51,11 +51,12 @@ h1 {margin: 0;} h2 {margin: 0;}
 .options
 {
     font-size: 1em;
-    margin: 0.5em 0em 0.5em;
+    font-weight: bold;
+    margin: 0.7em 0em 0.7em;
 }
 #logo
 {
-    margin: 0;
+    margin: 0 0 2em;
     font-weight: bolder;
     font-size: 1.25em;
 }
