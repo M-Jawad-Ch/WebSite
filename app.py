@@ -32,10 +32,12 @@ def verify():
     if user and user.password == md5(password.encode()).hexdigest():
         resp = redirect('/admin')
         resp.set_cookie('uname', 'jawad')
+
+        if user.admin:
+            resp.set_cookie('main-auth', True)
+
         return resp
     else: return make_response('', 404)
-
-
 
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
@@ -87,8 +89,10 @@ def admin_posts(val):
         return make_response(jsonify({'url':p.url, 'title':p.title, 'body':p.body}))
     
     elif val == 'get-all':
-        posts = dbHandler.get_all(Post)
-        return make_response(jsonify( [{'url':p.url, 'title':p.title, 'body':p.body} for p in posts] ))
+        if 'main-auth' not in request.cookies.keys():
+            posts = dbHandler.sess.query(Post).filter(Post.owner == request.cookies.get('uname'))
+        else: posts = dbHandler.get_all(Post)
+        return make_response(jsonify( [{'url':p.url, 'title':p.title, 'body':p.body, 'owner':p.owner} for p in posts] ))
     
     elif val == 'delete':
         dbHandler.delete(title_parser(params['title']), Post)

@@ -35,6 +35,8 @@
         let items = [], current = -1, prevTitle = null, firstTime = true;
         let bodyView = null, titleViews = null, urlView = null;
 
+        let titleVal = null, bodyVal = null;
+
         function showPublish() {
             current = -1; prevTitle = null;
 
@@ -130,7 +132,16 @@
             input = document.getElementById('main-input')
             preview = document.getElementById('preview')
 
+            title.value = titleVal;
+            input.value = bodyVal;
+            preview.innerHTML = bodyVal;
+
+            title.addEventListener('input', (event) => {
+                titleVal = title.value;
+            })
+
             input.addEventListener('input', (event) => {
+                bodyVal = input.value
                 preview.innerHTML = input.value;
                 title.style.color = 'black';
             })
@@ -165,8 +176,9 @@
             parent.innerHTML = '';
             for(let i = 0; i < list.length; i++) {
                 parent.innerHTML += `
-                <div class="row titles" onclick="selectItem(${i}, ${list.length})" id="title-${i}"> ${list[i].title} </div>
-                `
+                    <div class="row titles" onclick="selectItem(${i}, ${list.length})" id="title-${i}">
+                        ${list[i].title} -- <em>${list[i].owner}</em>
+                    </div>`
             }
 
             urlView.innerHTML = '<br>'
@@ -213,6 +225,7 @@
                 background-color: var(--title-bg-col);
                 margin: 0.1em 0em;
                 padding: 0.1em 0.3em;
+                overflow: auto;
             }
 
             #title-edit-input {
