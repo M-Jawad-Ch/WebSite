@@ -16,7 +16,7 @@ CORS(app)
 
 @app.route('/')
 def index():
-    return 'Hello World'
+    return render_template('index.html')
 
 @app.route('/login')
 def login():

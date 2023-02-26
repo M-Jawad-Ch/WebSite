@@ -1,0 +1,32 @@
+a {
+    color: inherit;
+}
+
+a:hover {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+a:visited {
+    color: inherit;
+    text-decoration: inherit;
+}
+
+.row {
+    margin: 0;
+}
+
+.header {
+    padding: 0em 1em;
+
+    background-color: whitesmoke;
+    font-size: large;
+    font-weight: bold;
+
+    text-align: center;
+    font-style: italic;
+}
+
+#content {
+    padding: 1em;
+}
