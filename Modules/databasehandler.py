@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, String
+from sqlalchemy import create_engine, Column, String, Boolean
 from sqlalchemy.orm import sessionmaker, declarative_base
 from re import sub
 
@@ -15,14 +15,33 @@ class Post(Base):
     url = Column('url', String, primary_key=True)
     title = Column("title", String)
     body = Column("body", String)
+    owner = Column('owner', String)
 
-    def __init__(self, title, body) -> None:
+    def __init__(self, title, body, owner) -> None:
         self.url = title_parser(title)
         self.title = title
         self.body = body
+        self.owner = owner
     
     def __repr__(self):
         return f'({self.title}) {self.body}'
+
+class User(Base):
+    __tablename__ = 'users'
+
+    uname = Column('uname', String, primary_key=True)
+    name = Column('name', String)
+    password = Column('password', String)
+    admin = Column('admin', Boolean)
+
+    def __init__(self, uname, name, password, isAdmin = False) -> None:
+        self.uname = uname
+        self.name = name
+        self.password = password
+        self.admin = isAdmin
+    
+    def __repr__(self):
+        return f'({self.uname}) {self.name}'
 
 def get_session(dbname):
     engine = create_engine(f"sqlite:///{dbname}")
@@ -34,23 +53,25 @@ class DbHandler():
     def __init__(self, dbname) -> None:
         self.sess = get_session(dbname)
     
-    def insert(self, post:Post) -> None:
-        self.sess.add(post)
+    def insert(self, val) -> None:
+        self.sess.add(val)
         self.sess.commit()
     
-    def delete(self, key:str) -> None:
-        post = self.get(key)
-        self.sess.delete(post)
+    def delete(self, key:str, type) -> None:
+        val = self.get(key, type)
+        
+        self.sess.delete(val)
         self.sess.commit()
     
-    def update(self, key:str, post:Post) -> None:
-        prev = self.get(key)
+    def update(self, key:str, val, type) -> None:
+        prev = self.get(key, type)
+
         self.sess.delete(prev)
-        self.sess.add(post)
+        self.sess.add(val)
         self.sess.commit()
     
-    def get(self, key:str) -> Post:
-        return self.sess.get(Post, key)
+    def get(self, key:str, type) -> type:
+        return self.sess.get(type, key)
     
-    def get_all(self) -> list:
-        return self.sess.query(Post).all()
+    def get_all(self, type) -> list:
+        return self.sess.query(type).all()

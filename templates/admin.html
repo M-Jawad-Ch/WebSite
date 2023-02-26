@@ -10,38 +10,34 @@
     <title>Dashboard</title>
 </head>
 <body>
-
     <div class="row main">
         <div class="col-xs-2 sidebar">
             <a href="/admin"><h1 class="options" id="logo">Dashboard</h1></a>
-
-            <h2 class="options" onclick="showPublish()">Publish</h2>
-
-            <h2 class="options" onclick="showViewAll()">View All</h2>
-
+            <h2 class="options" onclick="showPublish()">New</h2>
+            <h2 class="options" onclick="showViewAll()">Posts</h2>
+            <h2 class="options" onclick="showImages()">Images</h2>
         </div>
         <div class="col-sm-10 col-xs-12 main-body">
             <div class="header">
                 <br>
             </div>
-
-            <div id="content"></div>
-
+            <div id="content">
+                <!--  -->
+            </div>
         </div>
     </div>
 
     <script>
         const headBlock = document.getElementById('head-block')
         const contentBlock = document.getElementById('content')
-        const footerBlock = document.getElementById('footer-block')
 
         let title = null, input = null, preview = null;
-
         let items = [], current = -1, prevTitle = null, firstTime = true;
-
         let bodyView = null, titleViews = null, urlView = null;
 
         function showPublish() {
+            current = -1; prevTitle = null;
+
             headBlock.innerHTML = `
                 #content
                 {
@@ -421,8 +417,10 @@
             urlView.innerHTML = items[idx].url
         }
 
-    </script>
+        function showImages() {
+            console.log('Show Images')
+        }
 
-    <script id="footer-block"></script>
+    </script>
 </body>
 </html>

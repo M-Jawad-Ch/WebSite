@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, session, url_for, make_response, jsonify, redirect
+from flask import Flask, render_template, request, url_for, make_response, jsonify, redirect
 from flask_cors import CORS
-from flask_session import Session
 from dotenv import load_dotenv
 import os
 from hashlib import md5
+from re import sub
 
-from Modules.databasehandler import DbHandler, Post, title_parser
+from Modules.databasehandler import DbHandler, Post, User, title_parser
 
 from sqlalchemy.exc import IntegrityError
 
@@ -26,46 +26,43 @@ def login():
 def verify():
     params = request.get_json()
 
-    if params['username'] == 'jawad' and md5(params['password'].encode()).hexdigest() == os.environ['admin_pass']:
-        session['user'] = 'jawad'
-        return redirect('/admin')
+    username = params['username']; password = params['password']
+    user:User = dbHandler.get(username, User)
+
+    if user and user.password == md5(password.encode()).hexdigest():
+        resp = redirect('/admin')
+        resp.set_cookie('uname', 'jawad')
+        return resp
     else: return make_response('', 404)
 
-@app.route('/logout', methods=['POST'])
+
+
+@app.route('/logout', methods=['POST', 'GET'])
 def logout():
-    session.pop('user', default=None)
-    return redirect('login')
+    resp = redirect('login')
+    resp.delete_cookie('uname')
+    return resp
 
 @app.route('/admin')
 def admin():
-    if 'user' not in session:
+    if 'uname' not in request.cookies.keys():
         return redirect('login')
     return render_template('admin.html')
 
 @app.route('/posts/<url>')
 def posts(url):
-    data = dbHandler.get(url)
+    url = sub(r'[^a-z\-]','', url.lower())
+
+    data = dbHandler.get(url, Post)
 
     if not data:
-        render_template('404.html')
+        return render_template('404.html')
     
     return render_template('posts.html', data={'heading':data.title, 'body':data.body})
 
-"""@app.route('/admin/<val>')
-def admin_opts(val):
-    if 'user' not in session:
-        return redirect('login')
-
-    opts = ['publish', 'view-all']
-
-    if val not in opts:
-        return render_template('404.html')
-    
-    return render_template(val + '.html')"""
-
 @app.route('/admin-post/<val>', methods=['GET', 'POST', 'OPTIONS', 'DELETE'])
 def admin_posts(val):
-    if 'user' not in session:
+    if 'uname' not in request.cookies.keys():
         return redirect('login')
     
     opts = ['publish', 'get', 'update', 'update-title', 'get-all', 'delete']
@@ -76,7 +73,7 @@ def admin_posts(val):
     params = request.get_json()
 
     if val == 'publish':
-        p = Post(params['title'], params['body'])
+        p = Post(params['title'], params['body'], "jawad")
         try:
             dbHandler.insert(p)
         except IntegrityError:
@@ -86,19 +83,19 @@ def admin_posts(val):
         return make_response(jsonify({'status':'success'}), 200)
     
     elif val == 'get':
-        p = dbHandler.get(title_parser(params['title']))
+        p = dbHandler.get(title_parser(params['title']), Post)
         return make_response(jsonify({'url':p.url, 'title':p.title, 'body':p.body}))
     
     elif val == 'get-all':
-        posts = dbHandler.get_all()
+        posts = dbHandler.get_all(Post)
         return make_response(jsonify( [{'url':p.url, 'title':p.title, 'body':p.body} for p in posts] ))
     
     elif val == 'delete':
-        dbHandler.delete(title_parser(params['title']))
+        dbHandler.delete(title_parser(params['title']), Post)
         return make_response("", 200)
 
     elif val == 'update':
-        dbHandler.update(title_parser(params['prev-title']), Post(params['title'], params['body']))
+        dbHandler.update(title_parser(params['prev-title']), Post(params['title'], params['body'], "jawad"), Post)
         return make_response("", 200)
     
     return make_response('Not found' , 404)
@@ -107,6 +104,5 @@ def admin_posts(val):
 if __name__ == '__main__':
     app.secret_key = os.environ['session_secret_key']
     app.config['SESSION_TYPE'] = 'filesystem'
-    Session(app)
     dbHandler = DbHandler('database.db')
     app.run(debug=True)
