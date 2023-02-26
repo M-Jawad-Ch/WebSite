@@ -104,6 +104,10 @@ def admin_posts(val):
     
     return make_response('Not found' , 404)
 
+@app.route('/img-urls', methods=['POST','GET'])
+def img_urls():
+    urls = os.listdir('static/images')
+    return make_response(jsonify(urls))
 
 if __name__ == '__main__':
     app.secret_key = os.environ['session_secret_key']

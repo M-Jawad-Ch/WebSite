@@ -28,6 +28,10 @@
     </div>
 
     <script>
+        function sleep(milliseconds) {  
+            return new Promise(resolve => setTimeout(resolve, milliseconds));  
+        }
+
         const headBlock = document.getElementById('head-block')
         const contentBlock = document.getElementById('content')
 
@@ -36,6 +40,141 @@
         let bodyView = null, titleViews = null, urlView = null;
 
         let titleVal = null, bodyVal = null;
+
+        class ImageViewer {
+            constructor() {
+                this.selected = -1;
+                this.urls = [];   
+            }
+
+            async get() {
+                let res = await fetch(
+                    '/img-urls',
+                    {
+                        method:'GET',
+                        data:JSON.stringify({}),
+                        headers: { 'Content-type':'application/json' }
+                    }
+                )
+
+                res = await res.json()
+                for(let i = 0; i < res.length; i++) {
+                    this.urls.push(res[i])
+                }
+            }
+
+            render() {
+                headBlock.innerHTML = `
+                    :root {
+                        --url-bg-col:antiquewhite;
+                        --url-selected-col:wheat;
+                        --selected-text-col:gray;
+                    }
+
+                    #content {
+                        padding: 2em;
+                    }
+
+                    .col-md-5, .col-md-7, .col-sm-5, col-sm-7 {
+                        padding: 0;
+                    }
+
+                    .container-type {
+                        padding: 0.5em 0.5em;
+                    }
+
+                    #url-view {
+                        overflow: auto;
+                        padding: 0.1em 0.3em;
+                        border: solid 2px rgba(0, 0, 0, 0.5);
+                        border-radius: 0.3em;
+                        height: 30em;
+                    }
+
+                    #img-view {
+                        overflow: auto;
+                        border: none;
+                    }
+
+                    img {
+                        width: 100%;
+                    }
+
+                    .urls
+                    {
+                        background-color: var(--url-bg-col);
+                        margin: 0.1em 0em;
+                        padding: 0.1em 0.3em;
+                        overflow: auto;
+                    }
+
+                    #url-edit-input {
+                        outline: transparent;
+                        width: 100%;
+                    }
+                    `
+
+                contentBlock.innerHTML = `
+                <div class="row">
+                    <div class="row">
+                        <div class="container-type">
+                            <div id="buttons">
+                                <button id="refresh-btn">Refresh</button>
+                                <button id="edit-btn">Edit</button>
+                                <button id="cancel-btn">Cancel</button>
+                                <button id="save-btn">Save Changes</button>
+                                <button id="delete-btn">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 col-sm-7">
+                        <div class="container-type">
+                            <div id="url-view">
+                                
+                                <!--<div class="row urls" id="url-0"> Item </div>-->
+            
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-7 col-sm-5">
+                        <div class="container-type" id="img-view-container">
+                            <div id="img-view">
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>`
+            }
+            
+            showUrls() {
+                urlView = document.getElementById('url-view');
+                for(let i = 0; i < this.urls.length; i++) {
+                    urlView.innerHTML += `<div class='row urls' id='url-${i}' onclick='imgViewer.select(${i})'> /static/images/${this.urls[i]} </div>`
+                }
+            }
+
+            select(idx) {
+                this.selected = idx;
+                for(let i = 0; i < this.urls.length; i++) {
+                    document.getElementById(`url-${i}`).style.backgroundColor = 'var(--url-bg-col)'
+                }
+                document.getElementById(`url-${idx}`).style.backgroundColor = 'var(--url-selected-col)'
+
+                document.getElementById('img-view').innerHTML = `<img src='/static/images/${this.urls[idx]}'>`
+            }
+        }
+
+        imgViewer = new ImageViewer();
+
+        function showImages() {
+            imgViewer.render()
+
+            if (imgViewer.urls.length == 0) {
+                imgViewer.get().then( x => imgViewer.showUrls() )
+            } else {
+                imgViewer.showUrls()
+            }
+        }
 
         function showPublish() {
             current = -1; prevTitle = null;
@@ -169,7 +308,6 @@
                     preview.innerHTML = 'An existing post already has the title.'
                 } else alert('The post has been published successfully.')
             })
-        
         }
     
         function displayTitles(parent, list) {
@@ -409,6 +547,13 @@
                     displayTitles(titleViews, items)
                 }
             }
+
+            document.onkeydown = (e) => {
+                if ( e.ctrlKey && e.which == 83 ) {
+                    event.preventDefault()
+                    saveBtn.click()
+                }
+            }
         }
 
         function selectItem(idx, length) {
@@ -428,10 +573,6 @@
             t.style.backgroundColor = 'var(--title-selected-col)';
 
             urlView.innerHTML = items[idx].url
-        }
-
-        function showImages() {
-            console.log('Show Images')
         }
 
     </script>

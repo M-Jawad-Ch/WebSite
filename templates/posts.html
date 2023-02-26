@@ -8,7 +8,7 @@
         <div>
             <h1>{{ data['heading'] }}</h1>
         </div>
-        <div>
+        <div id="body-txt">
             {{ data['body'] }}
         </div>
     </div>
@@ -16,4 +16,8 @@
         <!-- More Content -->
     </div>
 </div>
+<script>
+    let body = document.getElementById('body-txt')
+    body.innerHTML = body.innerText;
+</script>
 {% endblock %}
