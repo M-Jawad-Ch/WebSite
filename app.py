@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import os
 from hashlib import md5
 from re import sub
+from base64 import b64decode
 
 from Modules.databasehandler import DbHandler, Post, User, title_parser
 
@@ -67,7 +68,7 @@ def admin_posts(val):
     if 'uname' not in request.cookies.keys():
         return redirect('login')
     
-    opts = ['publish', 'get', 'update', 'update-title', 'get-all', 'delete']
+    opts = ['publish', 'get', 'update', 'update-title', 'get-all', 'delete', 'upload']
     
     if val not in opts:
         return redirect('404.html')
@@ -101,6 +102,16 @@ def admin_posts(val):
     elif val == 'update':
         dbHandler.update(title_parser(params['prev-title']), Post(params['title'], params['body'], "jawad"), Post)
         return make_response("", 200)
+    
+    elif val == 'upload':
+        blob:str = request.get_json()['data']
+        blob = sub(r'.+base64,','', blob)
+        blob = b64decode(blob)
+
+        with open(f'static/images/{request.get_json()["file-name"]}', 'wb') as f:
+            f.write(blob)
+
+        return make_response('', 200)
     
     return make_response('Not found' , 404)
 

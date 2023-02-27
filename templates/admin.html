@@ -22,7 +22,7 @@
                 <br>
             </div>
             <div id="content">
-                <!--  -->
+                <!--  -->                
             </div>
         </div>
     </div>
@@ -36,6 +36,9 @@
             constructor() {
                 this.selected = -1;
                 this.urls = [];
+
+                this.refreshBtn = null
+                this.uploadBtn = null
             }
 
             async get() {
@@ -48,7 +51,7 @@
                     }
                 )
 
-                res = await res.json()
+                res = await res.json(); this.urls = []
                 for(let i = 0; i < res.length; i++) {
                     this.urls.push(res[i])
                 }
@@ -103,18 +106,22 @@
                         outline: transparent;
                         width: 100%;
                     }
-                    `
 
+                    #choose-file {
+                        margin: 1em 0em;
+                    }
+
+                    `
                 contentBlock.innerHTML = `
                 <div class="row">
                     <div class="row">
                         <div class="container-type">
                             <div id="buttons">
-                                <button id="refresh-btn">Refresh</button>
-                                <button id="edit-btn">Edit</button>
-                                <button id="cancel-btn">Cancel</button>
-                                <button id="save-btn">Save Changes</button>
-                                <button id="delete-btn">Delete</button>
+                                <form id='main-form'>
+                                    <input type="file" id="choose-file" accept="image/*">
+                                    <button id="refresh-btn">Refresh</button>
+                                    <button id="upload-btn">Upload</button>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -135,10 +142,52 @@
                         </div>
                     </div>
                 </div>`
+
+                this.refreshBtn = document.getElementById('refresh-btn')
+                this.refreshBtn.addEventListener('click', async (event) => {
+                    event.preventDefault()
+                    await this.get()
+                    this.showUrls()
+                })
+
+                this.uploadBtn = document.getElementById('upload-btn')
+                this.uploadBtn.addEventListener('click', async (event) => {
+                    event.preventDefault()
+                    const fileInput = document.getElementById('choose-file')
+
+                    if (!fileInput.value) {
+                        return
+                    }
+
+                    const file = fileInput.files[0]
+
+                    let reader = new FileReader()
+
+                    reader.readAsDataURL(file)
+
+                    reader.addEventListener('load', async (event) => {
+                        let formData = new FormData()
+                        formData.append('file', reader.result)
+                        event.preventDefault()
+                        
+                        let res = await fetch(
+                            '/admin-post/upload',
+                            {
+                                method:'POST',
+                                headers:{'Content-type':'application/json'},
+                                body:JSON.stringify({'data':reader.result, 'file-name':file.name})
+                            }
+                        )
+
+                        this.refreshBtn.click()
+                    })
+
+                })
             }
             
             showUrls() {
                 this.urlView = document.getElementById('url-view');
+                this.urlView.innerHTML = '';
                 for(let i = 0; i < this.urls.length; i++) {
                     this.urlView.innerHTML += `<div class='row urls' id='url-${i}' onclick='imgViewer.select(${i})'> /static/images/${this.urls[i]} </div>`
                 }
@@ -330,7 +379,6 @@
                 this.editBtn = null
                 this.saveBtn = null
                 this.cancelBtn = null
-
 
                 this.current = -1
                 this.items = []
