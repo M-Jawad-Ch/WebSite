@@ -1,19 +1,14 @@
-from flask import Flask, render_template, request, url_for, make_response, jsonify, redirect
-from flask_cors import CORS
-from dotenv import load_dotenv
-import os
+from flask import render_template, request, url_for, make_response, jsonify, redirect
 from hashlib import md5
 from re import sub
 from base64 import b64decode
-
-from Modules.databasehandler import DbHandler, Post, User, title_parser
+from os import listdir
+from Modules.databasehandler import Post, User, title_parser
 
 from sqlalchemy.exc import IntegrityError
 
-load_dotenv()
+from init import app, dbHandler
 
-app = Flask(__name__)
-CORS(app)
 
 @app.route('/')
 def index():
@@ -117,11 +112,8 @@ def admin_posts(val):
 
 @app.route('/img-urls', methods=['POST','GET'])
 def img_urls():
-    urls = os.listdir('static/images')
+    urls = listdir('static/images')
     return make_response(jsonify(urls))
 
 if __name__ == '__main__':
-    app.secret_key = os.environ['session_secret_key']
-    app.config['SESSION_TYPE'] = 'filesystem'
-    dbHandler = DbHandler('database.db')
     app.run(debug=True)
