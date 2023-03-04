@@ -1,4 +1,4 @@
-from flask import render_template, request, url_for, make_response, jsonify, redirect
+from flask import render_template, request, make_response, jsonify, redirect, send_from_directory
 from hashlib import md5
 from re import sub
 from base64 import b64decode
@@ -7,7 +7,7 @@ from Modules.databasehandler import Post, User, title_parser
 
 from sqlalchemy.exc import IntegrityError
 
-from init import app, dbHandler
+from init import app, dbHandler, session_duration
 
 
 @app.route('/')
@@ -18,6 +18,11 @@ def index():
 def login():
     return render_template('login.html')
 
+@app.route('/static/<val>', methods=['GET'])
+def send_file(val):
+    return send_from_directory( 'static', val )
+    
+
 @app.route('/verify', methods=['POST'])
 def verify():
     params = request.get_json()
@@ -27,10 +32,10 @@ def verify():
 
     if user and user.password == md5(password.encode()).hexdigest():
         resp = redirect('/admin')
-        resp.set_cookie('uname', 'jawad')
+        resp.set_cookie('uname', 'jawad', max_age=session_duration)
 
         if user.admin:
-            resp.set_cookie('main-auth', True)
+            resp.set_cookie('main-auth', 'True')
 
         return resp
     else: return make_response('', 404)
@@ -47,7 +52,7 @@ def admin():
         return redirect('login')
     return render_template('admin.html')
 
-@app.route('/posts/<url>')
+@app.route('/posts/<url>', methods=['GET'])
 def posts(url):
     url = sub(r'[^a-z\-]','', url.lower())
 

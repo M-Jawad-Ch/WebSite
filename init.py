@@ -12,3 +12,5 @@ CORS(app)
 dbHandler = DbHandler('database.db')
 app.secret_key = environ['session_secret_key']
 app.config['SESSION_TYPE'] = 'filesystem'
+
+session_duration = 15 * 60

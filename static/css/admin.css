@@ -27,6 +27,9 @@ body
     --sidebar-bg-col: #4D455D;
 }
 
+img {
+    width: 100%;
+}
 
 a
 {
@@ -44,6 +47,7 @@ h1 {margin: 0;} h2 {margin: 0;}
     height: 100%;
     margin: 0;
 }
+
 .sidebar
 {
     background-color: var(--sidebar-bg-col);
@@ -67,12 +71,6 @@ h1 {margin: 0;} h2 {margin: 0;}
     font-size: 1.25em;
 }
 
-@media screen and (max-width:767px){
-    div.sidebar {
-        display: none;
-    }
-}
-
 .header
 {
     background-color: var(--header-col);
@@ -84,4 +82,10 @@ h1 {margin: 0;} h2 {margin: 0;}
 {
     padding: 0;
     height: 100%;
+}
+
+@media screen and (max-width:767px){
+    div.sidebar {
+        display: none;
+    }
 }

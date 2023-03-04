@@ -1,19 +1,50 @@
 {% extends 'main.html' %}
 
+{% block style %}
+<style>
+    body::-webkit-scrollbar {
+        display: none;
+    }
+
+    #heading {
+        font-size: 1.35em;
+    }
+
+    #body-txt {
+        font-size: 1.2em;
+        text-align: justify;
+    }
+
+    #right-bar {
+        padding: 0em 1em;
+        border-radius: 3px;
+        right: 1em;
+        background-color: rgba(0,0,0, 0.2);
+        position: fixed;
+        text-align: center;
+    }
+
+    img {
+        width: 100%;
+        padding: 1em 0em;
+    }
+</style>
+{% endblock %}
+
 {% block title %} {{ data['heading'] }} {% endblock %}
 
 {% block content %}
 <div class="row" id="content">
-    <div class="col-sm-10 col-md-8">
+    <div class="col-md-8 col-sm-8">
         <div>
-            <h1>{{ data['heading'] }}</h1>
+            <h1> <span id="heading"> {{ data['heading'] }} </span> </h1>
         </div>
         <div id="body-txt">
             {{ data['body'] }}
         </div>
     </div>
-    <div class="col-sm-2 col-md-4">
-        <!-- More Content -->
+    <div class="col-md-4 col-sm-4" id="right-bar">
+        <h2 style="font-size: 1.75em; font-style: oblique;"> <a href="/">Deterministic Deductions</a> </h2>
     </div>
 </div>
 <script>
